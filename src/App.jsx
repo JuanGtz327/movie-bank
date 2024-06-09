@@ -176,7 +176,7 @@ function App() {
                     <img
                       key={index}
                       src={movieElement.image}
-                      className="md:h-[500px] h-[400px] w-[330px] object-cover object-center mx-auto rounded-lg px-1"
+                      className="md:h-[500px] h-[400px] w-[330px] object-contain object-center mx-auto rounded-lg"
                     />
                     <figcaption className="block absolute bottom-0 md:bottom-8 md:left-2/4 md:flex w-full md:w-[calc(100%-4rem)] md:-translate-x-2/4 justify-between rounded-xl bg-white/10 py-4 px-6 shadow-lg shadow-black/5 saturate-150 backdrop-blur-sm">
                       <div className="md:block flex items-center justify-between md:mb-0 mb-3">
