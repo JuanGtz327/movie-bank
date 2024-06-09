@@ -12,6 +12,7 @@ import {
 import MovieRecommendations from "./MovieRecommendations";
 import { useEffect, useState } from "react";
 import moviesData from "./data/movies.json";
+import logo from "./assets/tmdb.svg";
 
 const movieKey = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -103,9 +104,9 @@ function App() {
       setLoading(true);
       const tempMovies = [];
       dataAiResponse.map(async (movieAI, index) => {
-        let char = '-'
-        if (movieAI.includes(':')) {
-          char = ':'
+        let char = "-";
+        if (movieAI.includes(":")) {
+          char = ":";
         }
         const movieName = movieAI
           .split(char)[0]
@@ -121,7 +122,6 @@ function App() {
           .trim();
         const results = await searchMovies(movieName, movieYear);
         const movieDataResoult = results[0];
-        console.log(movieDataResoult);
         tempMovies.push({
           movieName,
           movieDescription,
@@ -130,150 +130,165 @@ function App() {
         });
       });
       setDataAiResponseInfo(tempMovies);
-      setTimeout(()=>{
+      setTimeout(() => {
         setLoading(false);
-      },5000)
+      }, 5000);
     }
   }, [dataAiResponse]);
 
   return (
-    <div className="px-1 md:px-8">
-      <div className="w-fit mx-auto rounded-md pt-5 text-center">
-        <Typography variant="h1" color="white">
-          La Banca de Películas
-        </Typography>
-      </div>
-      <div className="grid grid-cols-12 md:py-24 xl:mt-12 py-12 md:h-[600px]">
-        <div className="col-span-full md:col-span-4 md:mx-auto mx-4 flex h-[350px] md:h-full">
-          <MovieRecommendations
-            moviesDataList={dataSearcher}
-            onMovieAIFetched={onMovieAIFetched}
-            onShowDrawer={onShowDrawer}
-          />
-        </div>
-        <div className="col-span-full md:col-span-8 md:mt-0 mt-6">
-          <Carousel loop={true} autoplay={true} className="rounded-xl pb-16">
-            {data.map((movieElement, index) => {
-              return (
-                <figure className="relative w-full" key={index}>
-                  <img
-                    key={index}
-                    src={movieElement.image}
-                    className="md:h-[500px] h-[400px] w-[330px] object-cover object-center mx-auto rounded-lg"
-                  />
-                  <figcaption className="block absolute bottom-0 md:bottom-8 md:left-2/4 md:flex w-full md:w-[calc(100%-4rem)] md:-translate-x-2/4 justify-between rounded-xl bg-white/10 py-4 px-6 shadow-lg shadow-black/5 saturate-150 backdrop-blur-sm">
-                    <div className="md:block flex items-center justify-between md:mb-0 mb-3">
-                      <Typography
-                        color="white"
-                        className="text-base md:text-xl font-bold text-center"
-                      >
-                        {movieElement.name}
-                      </Typography>
-                      <Typography color="white" className="md:mt-2 font-normal">
-                        {movieElement.seen ? "Vista" : "Por ver"}
-                      </Typography>
-                    </div>
-                    <div className="">
-                      <div className="flex justify-between">
-                        <Typography
-                          className="text-base md:text-xl font-bold"
-                          color="white"
-                        >
-                          Abi
-                        </Typography>
-                        <Rating
-                          unratedColor="gray"
-                          ratedColor="gray"
-                          ratedIcon={<RatedIcon color="white" />}
-                          unratedIcon={<UnratedIcon color="white" />}
-                          value={movieElement.a_qualification}
-                        />
-                      </div>
-                      <div className="flex justify-between gap-3 items-center">
-                        <Typography
-                          className="text-base md:text-xl font-bold"
-                          color="white"
-                        >
-                          Charly
-                        </Typography>
-                        <Rating
-                          unratedColor="gray"
-                          ratedColor="gray"
-                          ratedIcon={<RatedIcon />}
-                          unratedIcon={<UnratedIcon />}
-                          value={movieElement.c_qualification}
-                        />
-                      </div>
-                    </div>
-                  </figcaption>
-                </figure>
-              );
-            })}
-          </Carousel>
-        </div>
-      </div>
-      <Drawer open={open} onClose={closeDrawer} className="p-4" size={500}>
-        <div className="mb-6 flex items-center justify-between">
-          <Typography variant="h5" color="blue-gray">
-            Aqui tienes tus recomendaciones :D
+    <>
+      <div className="px-1 md:px-8">
+        <div className="w-fit mx-auto rounded-md pt-5 text-center">
+          <Typography variant="h1" color="white">
+            La Banca de Películas
           </Typography>
-          <IconButton variant="text" color="blue-gray" onClick={closeDrawer}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="h-5 w-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </IconButton>
         </div>
-        <Typography color="gray" className="mb-8 pr-4 font-normal">
-          Basado en como te sientes hoy, la banca de peliculas te recomienda
-          ver:
-        </Typography>
+        <div className="grid grid-cols-12 md:py-24 xl:mt-12 py-12 md:h-[600px]">
+          <div className="col-span-full md:col-span-4 md:mx-auto mx-4 flex h-[350px] md:h-full">
+            <MovieRecommendations
+              moviesDataList={dataSearcher}
+              onMovieAIFetched={onMovieAIFetched}
+              onShowDrawer={onShowDrawer}
+            />
+          </div>
+          <div className="col-span-full md:col-span-8 md:mt-0 mt-6">
+            <Carousel loop={true} autoplay={true} className="rounded-xl pb-16">
+              {data.map((movieElement, index) => {
+                return (
+                  <figure className="relative w-full" key={index}>
+                    <img
+                      key={index}
+                      src={movieElement.image}
+                      className="md:h-[500px] h-[400px] w-[330px] object-cover object-center mx-auto rounded-lg"
+                    />
+                    <figcaption className="block absolute bottom-0 md:bottom-8 md:left-2/4 md:flex w-full md:w-[calc(100%-4rem)] md:-translate-x-2/4 justify-between rounded-xl bg-white/10 py-4 px-6 shadow-lg shadow-black/5 saturate-150 backdrop-blur-sm">
+                      <div className="md:block flex items-center justify-between md:mb-0 mb-3">
+                        <Typography
+                          color="white"
+                          className="text-base md:text-xl font-bold text-center"
+                        >
+                          {movieElement.name}
+                        </Typography>
+                        <Typography
+                          color="white"
+                          className="md:mt-2 font-normal"
+                        >
+                          {movieElement.seen ? "Vista" : "Por ver"}
+                        </Typography>
+                      </div>
+                      <div className="">
+                        <div className="flex justify-between">
+                          <Typography
+                            className="text-base md:text-xl font-bold"
+                            color="white"
+                          >
+                            Abi
+                          </Typography>
+                          <Rating
+                            unratedColor="gray"
+                            ratedColor="gray"
+                            ratedIcon={<RatedIcon color="white" />}
+                            unratedIcon={<UnratedIcon color="white" />}
+                            value={movieElement.a_qualification}
+                          />
+                        </div>
+                        <div className="flex justify-between gap-3 items-center">
+                          <Typography
+                            className="text-base md:text-xl font-bold"
+                            color="white"
+                          >
+                            Charly
+                          </Typography>
+                          <Rating
+                            unratedColor="gray"
+                            ratedColor="gray"
+                            ratedIcon={<RatedIcon />}
+                            unratedIcon={<UnratedIcon />}
+                            value={movieElement.c_qualification}
+                          />
+                        </div>
+                      </div>
+                    </figcaption>
+                  </figure>
+                );
+              })}
+            </Carousel>
+          </div>
+        </div>
+        <Drawer open={open} onClose={closeDrawer} className="p-4" size={500}>
+          <div className="mb-6 flex items-center justify-between">
+            <Typography variant="h5" color="blue-gray">
+              Aqui tienes tus recomendaciones :D
+            </Typography>
+            <IconButton variant="text" color="blue-gray" onClick={closeDrawer}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </IconButton>
+          </div>
+          <Typography color="gray" className="mb-8 pr-4 font-normal">
+            Basado en como te sientes hoy, la banca de peliculas te recomienda
+            ver:
+          </Typography>
 
-        {loading===false && dataAiResponseInfo.map(
-            ({ movieName, movieDescription, movieYear, movieImage }, index) => {
-              return (
-                <Accordion open={accordionOpen === index} key={index}>
-                  <AccordionHeader onClick={() => handleOpen(index)}>
-                    {movieName}
-                  </AccordionHeader>
-                  <AccordionBody>
-                    <div className="flex gap-4">
-                      <img
-                        src={movieImage}
-                        className="md:h-[190px] h-[120px] md:w-[140px] w-[90px] object-cover object-center mx-auto rounded-lg"
-                      />
-                      <Typography
-                        color="gray"
-                        className="mb-8 pr-4 font-normal"
+          {loading === false &&
+            dataAiResponseInfo.map(
+              (
+                { movieName, movieDescription, movieYear, movieImage },
+                index
+              ) => {
+                return (
+                  <Accordion open={accordionOpen === index} key={index}>
+                    <AccordionHeader onClick={() => handleOpen(index)}>
+                      {movieName}
+                    </AccordionHeader>
+                    <AccordionBody>
+                      <div className="flex gap-4">
+                        <img
+                          src={movieImage}
+                          className="md:h-[190px] h-[120px] md:w-[140px] w-[90px] object-cover object-center mx-auto rounded-lg"
+                        />
+                        <Typography
+                          color="gray"
+                          className="mb-8 pr-4 font-normal"
+                        >
+                          {movieDescription} - {movieYear}
+                        </Typography>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outlined"
+                        color="purple"
+                        className="md:w-1/3 w-full mt-3"
                       >
-                        {movieDescription} - {movieYear}
-                      </Typography>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outlined"
-                      color="purple"
-                      className="md:w-1/3 w-full mt-3"
-                    >
-                      Agregar a la lista
-                    </Button>
-                  </AccordionBody>
-                </Accordion>
-              );
-            }
-          )}
-      </Drawer>
-    </div>
+                        Agregar a la lista
+                      </Button>
+                    </AccordionBody>
+                  </Accordion>
+                );
+              }
+            )}
+        </Drawer>
+      </div>
+      <div className="absolute bottom-5 w-[100px] right-16">
+        <div className="flex gap-2 w-full">
+          <p className="text-white">Using</p>
+          <img src={logo} className="" />
+        </div>
+      </div>
+    </>
   );
 }
 

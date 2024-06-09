@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import OpenAI from "openai";
 import {
   Button,
   Card,
@@ -11,19 +10,6 @@ import {
   Typography,
 } from "@material-tailwind/react";
 
-const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-const openai = new OpenAI({ apiKey:'sk-proj-cEnZQmeYUWKlcbKs9n5wT3BlbkFJfOSJH7fESS7JnFaPoUg1', dangerouslyAllowBrowser: true });
-
-const fetchRecommendations = async (emotions, moviesData) => {
-  const prompt = `Basandote en estas emociones: ${emotions} recomienda 3 peliculas de esta lista ${moviesData}, si no encuentras una dame una recomendacion tuya. Usa el formato pelicula (año) : descripcion`;
-
-  const completion = await openai.chat.completions.create({
-    messages: [{ role: "user", content: prompt }],
-    model: "gpt-3.5-turbo",
-  });
-
-  return completion.choices[0].message.content;
-};
 
 const MovieRecommendations = ({ moviesDataList, onMovieAIFetched, onShowDrawer }) => {
   const [emotions, setEmotions] = useState("");
@@ -35,15 +21,19 @@ const MovieRecommendations = ({ moviesDataList, onMovieAIFetched, onShowDrawer }
     setLoading(true);
     setError("");
     try {
-      const recommendationsText = await fetchRecommendations(
-        emotions,
-        moviesDataList
-      );
-      const recommendationsList = recommendationsText
-        .split("\n")
-        .filter((movie) => movie);
-      setRecommendations(recommendationsList);
-      onMovieAIFetched(recommendationsList);
+      const response = await fetch('http://localhost:3000/api/openai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({emotions,moviesDataList})
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const result = await response.json();
+      setRecommendations(result.recommendationsList);
+      onMovieAIFetched(result.recommendationsList);
     } catch (error) {
       console.error("Error fetching recommendations:", error);
       setError("Error fetching recommendations. Please try again later.");
