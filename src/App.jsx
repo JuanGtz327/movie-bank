@@ -1,86 +1,132 @@
 import {
-  Accordion,
-  AccordionBody,
-  AccordionHeader,
-  Button,
   Carousel,
   Drawer,
   IconButton,
   Rating,
   Typography,
 } from "@material-tailwind/react";
-import MovieRecommendations from "./MovieRecommendations";
 import { useEffect, useState } from "react";
 import moviesData from "./data/movies.json";
 import logo from "./assets/tmdb.svg";
+import MovieAccordion from "./MovieAccordion";
+import MovieForm from "./MovieForm";
 
+const backendURL = import.meta.env.VITE_BACK_URL;
 const movieKey = import.meta.env.VITE_TMDB_API_KEY;
+
+function RatedIcon({ color }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill={`${color ? color : "currentColor"}`}
+      className="h-6 w-6"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 2l3 5h6l-3 5l3 5h-6l-3 5l-3 -5h-6l3 -5l-3 -5h6z" />
+    </svg>
+  );
+}
+
+function UnratedIcon({ color }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      strokeWidth={1.5}
+      stroke={`${color ? color : "currentColor"}`}
+      className="h-6 w-6"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 2l3 5h6l-3 5l3 5h-6l-3 5l-3 -5h-6l3 -5l-3 -5h6z" />
+    </svg>
+  );
+}
 
 function App() {
   const [data, setData] = useState([]);
   const [dataAiResponse, setDataAiResponse] = useState([]);
-  const [dataAiResponseInfo, setDataAiResponseInfo] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const dataSearcher = data
-    .map((md) => {
-      if (md.name && !md.seen) return md.name;
-    })
-    .join(",");
   const openDrawer = () => setOpen(true);
   const closeDrawer = () => setOpen(false);
-  const [accordionOpen, setAccordionOpen] = useState(0);
 
-  const handleOpen = (value) =>
-    setAccordionOpen(accordionOpen === value ? 0 : value);
+  const onShowDrawer = () => {
+    openDrawer();
+  };
 
   useEffect(() => {
     setData(moviesData);
   }, []);
 
-  function RatedIcon({ color }) {
-    return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill={`${color ? color : "currentColor"}`}
-        className="h-6 w-6"
-      >
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M12 2l3 5h6l-3 5l3 5h-6l-3 5l-3 -5h-6l3 -5l-3 -5h6z" />
-      </svg>
-    );
-  }
+  useEffect(() => {
+    if (dataAiResponse.length > 0) openDrawer();
+  }, [dataAiResponse]);
 
-  function UnratedIcon({ color }) {
-    return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        strokeWidth={1.5}
-        stroke={`${color ? color : "currentColor"}`}
-        className="h-6 w-6"
-      >
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M12 2l3 5h6l-3 5l3 5h-6l-3 5l-3 -5h-6l3 -5l-3 -5h6z" />
-      </svg>
-    );
-  }
+  const getRecommendations = async (emotions) => {
+    setLoading(true);
+    let url = "http://localhost:3000/api/openai";
+    if (backendURL) url = `${backendURL}/api/openai`;
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ emotions }),
+      });
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const result = await response.json();
 
-  const onMovieAIFetched = (response) => {
-    setOpen(true);
-    setDataAiResponse(response);
-  };
-
-  const onShowDrawer = () => {
-    setOpen(true);
+      if (result.recommendationsList.length > 0) {
+        const tempMoviesPromises = result.recommendationsList.map(
+          async (movieAI) => {
+            try {
+              const movieParts = movieAI.split(":");
+              const movieName = movieParts[0]
+                .split(".")[1]
+                .split("(")[0]
+                .trim();
+              const movieDescription = movieParts[1].trim();
+              const movieYear = movieParts[0]
+                .split(".")[1]
+                .split("(")[1]
+                .replace(")", "")
+                .trim();
+              const results = await searchMovies(movieName, movieYear);
+              const movieDataResoult = results[0];
+              return {
+                movieName,
+                movieDescription,
+                movieYear,
+                movieImage: `https://image.tmdb.org/t/p/w500${movieDataResoult.poster_path}`,
+              };
+            } catch (error) {
+              console.log(`Error in movie ${movieAI} was ${error}`);
+              return null
+            }
+          }
+        );
+        const tempMovies = await Promise.all(tempMoviesPromises);
+        setDataAiResponse(tempMovies);
+      } else {
+        setError("No se encontraron peliculas :/");
+        setDataAiResponse([]);
+      }
+    } catch (error) {
+      setError("");
+      console.error("Error fetching recommendations:", error);
+      setError("Error fetching recommendations. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const searchMovies = async (movieName, year = "") => {
-    setLoading(true);
-    setError("");
     try {
       const response = await fetch(
         `https://api.themoviedb.org/3/search/movie?api_key=${movieKey}&query=${encodeURIComponent(
@@ -94,47 +140,8 @@ function App() {
       return data.results;
     } catch (error) {
       setError("Error al buscar la película. Por favor, intenta de nuevo.");
-    } finally {
-      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (dataAiResponse.length > 0) {
-      setLoading(true);
-      const tempMovies = [];
-      dataAiResponse.map(async (movieAI, index) => {
-        let char = "-";
-        if (movieAI.includes(":")) {
-          char = ":";
-        }
-        const movieName = movieAI
-          .split(char)[0]
-          .split(".")[1]
-          .split("(")[0]
-          .trim();
-        const movieDescription = movieAI.split(char)[1].trim();
-        const movieYear = movieAI
-          .split(char)[0]
-          .split(".")[1]
-          .split("(")[1]
-          .replace(")", "")
-          .trim();
-        const results = await searchMovies(movieName, movieYear);
-        const movieDataResoult = results[0];
-        tempMovies.push({
-          movieName,
-          movieDescription,
-          movieYear,
-          movieImage: `https://image.tmdb.org/t/p/w500${movieDataResoult.poster_path}`,
-        });
-      });
-      setDataAiResponseInfo(tempMovies);
-      setTimeout(() => {
-        setLoading(false);
-      }, 5000);
-    }
-  }, [dataAiResponse]);
 
   return (
     <>
@@ -146,9 +153,10 @@ function App() {
         </div>
         <div className="grid grid-cols-12 md:py-24 xl:mt-12 py-12 md:h-[600px]">
           <div className="col-span-full md:col-span-4 md:mx-auto mx-4 flex h-[350px] md:h-full">
-            <MovieRecommendations
-              moviesDataList={dataSearcher}
-              onMovieAIFetched={onMovieAIFetched}
+            <MovieForm
+              getRecommendations={getRecommendations}
+              loading={loading}
+              recommendations={dataAiResponse}
               onShowDrawer={onShowDrawer}
             />
           </div>
@@ -239,47 +247,14 @@ function App() {
             </IconButton>
           </div>
           <Typography color="gray" className="mb-8 pr-4 font-normal">
-            Basado en como te sientes hoy, la banca de peliculas te recomienda
-            ver:
+            Basado en tus gustos, la banca de peliculas te recomienda ver:
           </Typography>
-
-          {loading === false &&
-            dataAiResponseInfo.map(
-              (
-                { movieName, movieDescription, movieYear, movieImage },
-                index
-              ) => {
-                return (
-                  <Accordion open={accordionOpen === index} key={index}>
-                    <AccordionHeader onClick={() => handleOpen(index)}>
-                      {movieName}
-                    </AccordionHeader>
-                    <AccordionBody>
-                      <div className="flex gap-4">
-                        <img
-                          src={movieImage}
-                          className="md:h-[190px] h-[120px] md:w-[140px] w-[90px] object-cover object-center mx-auto rounded-lg"
-                        />
-                        <Typography
-                          color="gray"
-                          className="mb-8 pr-4 font-normal"
-                        >
-                          {movieDescription} - {movieYear}
-                        </Typography>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outlined"
-                        color="purple"
-                        className="md:w-1/3 w-full mt-3"
-                      >
-                        Agregar a la lista
-                      </Button>
-                    </AccordionBody>
-                  </Accordion>
-                );
-              }
-            )}
+          {error !== "" && (
+            <Typography color="red" className="mb-8 pr-4 font-normal">
+              {error}
+            </Typography>
+          )}
+          <MovieAccordion loading={loading} dataAiResponse={dataAiResponse} />
         </Drawer>
       </div>
       <div className="hidden md:block absolute bottom-5 w-[100px] right-16">

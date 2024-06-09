@@ -9,45 +9,14 @@ import {
   Textarea,
   Typography,
 } from "@material-tailwind/react";
-const backendURL = import.meta.env.VITE_BACK_URL;
 
-const MovieRecommendations = ({
-  moviesDataList,
-  onMovieAIFetched,
+const MovieForm= ({
+  getRecommendations,
+  recommendations,
+  loading,
   onShowDrawer,
 }) => {
   const [emotions, setEmotions] = useState("");
-  const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const getRecommendations = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await fetch(
-        `${backendURL}/api/openai` || "http://localhost:3000/api/openai",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ emotions, moviesDataList }),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const result = await response.json();
-      setRecommendations(result.recommendationsList);
-      onMovieAIFetched(result.recommendationsList);
-    } catch (error) {
-      console.error("Error fetching recommendations:", error);
-      setError("Error fetching recommendations. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <Card className="w-full md:w-96">
@@ -56,7 +25,7 @@ const MovieRecommendations = ({
         className="mb-4 grid h-48 place-items-center bg-[#5a39a7] text-center"
       >
         <Typography color="white" className="text-2xl md:text-3xl font-bold">
-          ¿Cómo te sientes hoy?
+          ¿Qué te apetece ver?
         </Typography>
       </CardHeader>
       <CardBody className="flex flex-col gap-4 h-full justify-center">
@@ -64,7 +33,7 @@ const MovieRecommendations = ({
           value={emotions}
           name="feelings"
           variant="standard"
-          placeholder="Me siento feliz :D"
+          placeholder="Quiero algo de terror canibal extremo 🤠"
           color="purple"
           size="lg"
           className="h-fit"
@@ -78,7 +47,7 @@ const MovieRecommendations = ({
           <Button
             className="bg-[#5a39a7]"
             fullWidth
-            onClick={getRecommendations}
+            onClick={()=>{getRecommendations(emotions)}}
             disabled={loading}
           >
             Recomiendame una película !!!
@@ -99,7 +68,6 @@ const MovieRecommendations = ({
         <Button
           className="hidden bg-[#1DB954] text-[#191414] mt-5 justify-center items-center gap-1"
           fullWidth
-          onClick={getRecommendations}
           disabled={loading}
         >
           <svg
@@ -123,4 +91,4 @@ const MovieRecommendations = ({
   );
 };
 
-export default MovieRecommendations;
+export default MovieForm;
