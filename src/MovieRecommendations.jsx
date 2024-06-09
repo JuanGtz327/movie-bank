@@ -12,7 +12,7 @@ import {
 } from "@material-tailwind/react";
 
 const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+const openai = new OpenAI({ apiKey:'sk-proj-cEnZQmeYUWKlcbKs9n5wT3BlbkFJfOSJH7fESS7JnFaPoUg1', dangerouslyAllowBrowser: true });
 
 const fetchRecommendations = async (emotions, moviesData) => {
   const prompt = `Basandote en estas emociones: ${emotions} recomienda 3 peliculas de esta lista ${moviesData}, si no encuentras una dame una recomendacion tuya. Usa el formato pelicula (año) : descripcion`;
