@@ -5,24 +5,34 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
+  Checkbox,
   Spinner,
   Textarea,
   Typography,
 } from "@material-tailwind/react";
 
-const MovieForm= ({
+const MovieForm = ({
   getRecommendations,
   recommendations,
   loading,
   onShowDrawer,
 }) => {
   const [emotions, setEmotions] = useState("");
+  const [checkedValue, setCheckedValue] = useState("movie");
+
+  const onNewTypeOfContent = (value) => {
+    if (value === "movie") {
+      setCheckedValue("movie");
+    } else {
+      setCheckedValue("tv");
+    }
+  };
 
   return (
     <Card className="w-full md:w-96">
       <CardHeader
         variant="gradient"
-        className="mb-4 grid h-48 place-items-center bg-[#5a39a7] text-center"
+        className="mb-4 grid h-48 place-items-center bg-[#302057] text-center"
       >
         <Typography color="white" className="text-2xl md:text-3xl font-bold">
           ¿Qué te apetece ver?
@@ -42,15 +52,37 @@ const MovieForm= ({
           }}
         />
       </CardBody>
-      <CardFooter className="pt-0 mt-auto md:pb-16">
+      <CardFooter className="pt-0 mt-auto">
+        <div className="flex justify-center gap-4 mb-2">
+          <Checkbox
+            color="blue-gray"
+            checked={checkedValue === "movie"}
+            label="Pelicula"
+            value={"movie"}
+            onChange={(e) => {
+              onNewTypeOfContent(e.target.value);
+            }}
+          />
+          <Checkbox
+            color="deep-purple"
+            checked={checkedValue === "tv"}
+            label="Serie"
+            value={"tv"}
+            onChange={(e) => {
+              onNewTypeOfContent(e.target.value);
+            }}
+          />
+        </div>
         {!loading ? (
           <Button
-            className="bg-[#5a39a7]"
+            className="bg-[#302057]"
             fullWidth
-            onClick={()=>{getRecommendations(emotions)}}
+            onClick={() => {
+              getRecommendations(emotions,checkedValue);
+            }}
             disabled={loading}
           >
-            Recomiendame una película !!!
+            Quiero mi recomendación !!!
           </Button>
         ) : (
           <Spinner color="purple" className="h-8 w-8 mx-auto" />
@@ -66,7 +98,7 @@ const MovieForm= ({
           </Button>
         )}
         <Button
-          className="hidden bg-[#1DB954] text-[#191414] mt-5 justify-center items-center gap-1"
+          className="flex py-1.5 bg-[#46af38] text-[#191414] mt-5 justify-center items-center gap-1"
           fullWidth
           disabled={loading}
         >

@@ -43,14 +43,6 @@ const MovieAccordion = ({ loading, dataAiResponse }) => {
                       {movieDescription}
                     </Typography>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outlined"
-                    color="purple"
-                    className="md:w-1/3 w-full mt-3"
-                  >
-                    Agregar a la lista
-                  </Button>
                 </AccordionBody>
               </Accordion>
             );

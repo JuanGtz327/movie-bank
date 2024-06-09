@@ -65,7 +65,7 @@ function App() {
     if (dataAiResponse.length > 0) openDrawer();
   }, [dataAiResponse]);
 
-  const getRecommendations = async (emotions) => {
+  const getRecommendations = async (emotions, type) => {
     setLoading(true);
     let url = "http://localhost:3000/api/openai";
     if (backendURL) url = `${backendURL}/api/openai`;
@@ -75,7 +75,7 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ emotions }),
+        body: JSON.stringify({ emotions, type }),
       });
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -86,7 +86,8 @@ function App() {
         const tempMoviesPromises = result.recommendationsList.map(
           async (movieAI) => {
             try {
-              const movieParts = movieAI.split(":");
+              const separator = movieAI.includes(" - ") ? "-" : ":";
+              const movieParts = movieAI.split(separator);
               const movieName = movieParts[0]
                 .split(".")[1]
                 .split("(")[0]
@@ -97,7 +98,7 @@ function App() {
                 .split("(")[1]
                 .replace(")", "")
                 .trim();
-              const results = await searchMovies(movieName, movieYear);
+              const results = await searchMovies(movieName, movieYear, type);
               const movieDataResoult = results[0];
               return {
                 movieName,
@@ -107,7 +108,7 @@ function App() {
               };
             } catch (error) {
               console.log(`Error in movie ${movieAI} was ${error}`);
-              return null
+              return null;
             }
           }
         );
@@ -126,10 +127,10 @@ function App() {
     }
   };
 
-  const searchMovies = async (movieName, year = "") => {
+  const searchMovies = async (movieName, year = "", type) => {
     try {
       const response = await fetch(
-        `https://api.themoviedb.org/3/search/movie?api_key=${movieKey}&query=${encodeURIComponent(
+        `https://api.themoviedb.org/3/search/${type}?api_key=${movieKey}&query=${encodeURIComponent(
           movieName
         )}${year !== "" && `&year=${year}`}`
       );
@@ -140,6 +141,7 @@ function App() {
       return data.results;
     } catch (error) {
       setError("Error al buscar la película. Por favor, intenta de nuevo.");
+      console.log("mamo" + error);
     }
   };
 
@@ -147,12 +149,18 @@ function App() {
     <>
       <div className="px-1 md:px-8">
         <div className="w-fit mx-auto rounded-md pt-5 text-center">
-          <Typography variant="h1" color="white">
-            La Banca de Películas
-          </Typography>
+          <figcaption className="absolute top-10 md:top-5 left-2/4 flex md:w-fit w-[300px] -translate-x-2/4 justify-center rounded bg-[#302057] px-1 py-2 md:py-4 md:px-6 shadow-lg shadow-black/5 saturate-150 backdrop-blur-sm">
+            <div className="flex gap-1 md:gap-3">
+              <Typography
+                className="text-3xl md:text-5xl font-bold text-white"
+              >
+                La <span className="text-purple-800">Banca</span> de Películas
+              </Typography>
+            </div>
+          </figcaption>
         </div>
-        <div className="grid grid-cols-12 md:py-24 xl:mt-12 py-12 md:h-[600px]">
-          <div className="col-span-full md:col-span-4 md:mx-auto mx-4 flex h-[350px] md:h-full">
+        <div className="mt-16 grid grid-cols-12 md:py-24 md:mt-12 py-12 md:h-[600px]">
+          <div className="col-span-full md:col-span-4 md:mx-auto mx-4 flex h-[450px] md:h-full">
             <MovieForm
               getRecommendations={getRecommendations}
               loading={loading}
@@ -168,7 +176,7 @@ function App() {
                     <img
                       key={index}
                       src={movieElement.image}
-                      className="md:h-[500px] h-[400px] w-[330px] object-cover object-center mx-auto rounded-lg"
+                      className="md:h-[500px] h-[400px] w-[330px] object-cover object-center mx-auto rounded-lg px-1"
                     />
                     <figcaption className="block absolute bottom-0 md:bottom-8 md:left-2/4 md:flex w-full md:w-[calc(100%-4rem)] md:-translate-x-2/4 justify-between rounded-xl bg-white/10 py-4 px-6 shadow-lg shadow-black/5 saturate-150 backdrop-blur-sm">
                       <div className="md:block flex items-center justify-between md:mb-0 mb-3">
@@ -259,13 +267,13 @@ function App() {
       </div>
       <div className="hidden md:block absolute bottom-5 w-[100px] right-16">
         <div className="flex gap-2 w-full">
-          <p className="text-white">Using</p>
+          <p className="text-black">Using</p>
           <img src={logo} className="" />
         </div>
       </div>
       <div className="absolute md:hidden top-0 w-[70px] right-14">
         <div className="flex gap-2 w-full">
-          <p className="text-white">Using</p>
+          <p className="text-black">Using</p>
           <img src={logo} className="" />
         </div>
       </div>
