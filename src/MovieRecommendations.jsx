@@ -26,7 +26,7 @@ const MovieRecommendations = ({
     setError("");
     try {
       const response = await fetch(
-        backendURL || "http://localhost:3000/api/openai",
+        `${backendURL}/api/openai` || "http://localhost:3000/api/openai",
         {
           method: "POST",
           headers: {
