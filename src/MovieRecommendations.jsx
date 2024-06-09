@@ -9,9 +9,13 @@ import {
   Textarea,
   Typography,
 } from "@material-tailwind/react";
+const backendURL = import.meta.env.VITE_BACK_URL;
 
-
-const MovieRecommendations = ({ moviesDataList, onMovieAIFetched, onShowDrawer }) => {
+const MovieRecommendations = ({
+  moviesDataList,
+  onMovieAIFetched,
+  onShowDrawer,
+}) => {
   const [emotions, setEmotions] = useState("");
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,15 +25,18 @@ const MovieRecommendations = ({ moviesDataList, onMovieAIFetched, onShowDrawer }
     setLoading(true);
     setError("");
     try {
-      const response = await fetch('http://localhost:3000/api/openai', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({emotions,moviesDataList})
-      });
+      const response = await fetch(
+        backendURL || "http://localhost:3000/api/openai",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ emotions, moviesDataList }),
+        }
+      );
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
       const result = await response.json();
       setRecommendations(result.recommendationsList);

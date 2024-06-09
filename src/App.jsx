@@ -282,7 +282,13 @@ function App() {
             )}
         </Drawer>
       </div>
-      <div className="absolute bottom-5 w-[100px] right-16">
+      <div className="hidden md:block absolute bottom-5 w-[100px] right-16">
+        <div className="flex gap-2 w-full">
+          <p className="text-white">Using</p>
+          <img src={logo} className="" />
+        </div>
+      </div>
+      <div className="absolute md:hidden top-0 w-[70px] right-14">
         <div className="flex gap-2 w-full">
           <p className="text-white">Using</p>
           <img src={logo} className="" />
