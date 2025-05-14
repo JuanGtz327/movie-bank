@@ -151,16 +151,14 @@ function App() {
         <div className="w-fit mx-auto rounded-md pt-5 text-center">
           <figcaption className="absolute top-10 md:top-5 left-2/4 flex md:w-fit w-[300px] -translate-x-2/4 justify-center rounded bg-[#302057] px-1 py-2 md:py-4 md:px-6 shadow-lg shadow-black/5 saturate-150 backdrop-blur-sm">
             <div className="flex gap-1 md:gap-3">
-              <Typography
-                className="text-3xl md:text-5xl font-bold text-white"
-              >
+              <Typography className="text-3xl md:text-5xl font-bold text-white">
                 La <span className="text-purple-800">Banca</span> de Películas
               </Typography>
             </div>
           </figcaption>
         </div>
-        <div className="mt-16 grid grid-cols-12 md:py-24 md:mt-12 py-12 md:h-[600px]">
-          <div className="col-span-full md:col-span-4 md:mx-auto mx-4 flex h-[450px] md:h-full">
+        <div className="mt-16 grid grid-cols-12 md:py-24 md:mt-12 py-12">
+          <div className="col-span-full md:mx-auto mx-4 flex">
             <MovieForm
               getRecommendations={getRecommendations}
               loading={loading}
@@ -168,6 +166,7 @@ function App() {
               onShowDrawer={onShowDrawer}
             />
           </div>
+          {/*
           <div className="col-span-full md:col-span-8 md:mt-0 mt-6">
             <Carousel loop={true} autoplay={true} className="rounded-xl pb-16">
               {data.map((movieElement, index) => {
@@ -199,6 +198,7 @@ function App() {
               })}
             </Carousel>
           </div>
+          */}
         </div>
         <Drawer open={open} onClose={closeDrawer} className="p-4" size={500}>
           <div className="mb-6 flex items-center justify-between">
