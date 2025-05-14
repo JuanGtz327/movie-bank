@@ -193,38 +193,6 @@ function App() {
                           {movieElement.seen ? "Vista" : "Por ver"}
                         </Typography>
                       </div>
-                      <div className="">
-                        <div className="flex justify-between">
-                          <Typography
-                            className="text-base md:text-xl font-bold"
-                            color="white"
-                          >
-                            Abi
-                          </Typography>
-                          <Rating
-                            unratedColor="gray"
-                            ratedColor="gray"
-                            ratedIcon={<RatedIcon color="white" />}
-                            unratedIcon={<UnratedIcon color="white" />}
-                            value={movieElement.a_qualification}
-                          />
-                        </div>
-                        <div className="flex justify-between gap-3 items-center">
-                          <Typography
-                            className="text-base md:text-xl font-bold"
-                            color="white"
-                          >
-                            Charly
-                          </Typography>
-                          <Rating
-                            unratedColor="gray"
-                            ratedColor="gray"
-                            ratedIcon={<RatedIcon />}
-                            unratedIcon={<UnratedIcon />}
-                            value={movieElement.c_qualification}
-                          />
-                        </div>
-                      </div>
                     </figcaption>
                   </figure>
                 );
